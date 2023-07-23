@@ -32,6 +32,8 @@ python drive.py
 
 Mã nguồn điều khiển sẽ nhận hình ảnh từ giả lập và trả về tín hiệu điều khiển cho xe.
 
+![](images/control.png)
+
 ## 2. Đăng ký và nộp bài trên hệ thống
 
 Thông tin này sẽ được cập nhật trong thời gian tới

@@ -114,13 +114,10 @@ def calculate_control_signal(img, draw=None):
         # You can apply some advanced control algorithm here
         # For examples, PID
         steering_angle = - float(center_diff * 0.01)
-        print("I: ", steering_angle)
 
         # Clip steering angle
         steering_angle = max(-1, min(1, steering_angle))
         if abs(steering_angle) < 0.05:
             steering_angle = 0
-
-        print(steering_angle)
 
     return throttle, steering_angle

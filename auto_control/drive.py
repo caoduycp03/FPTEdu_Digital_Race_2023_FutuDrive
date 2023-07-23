@@ -67,6 +67,7 @@ async def process_image(websocket, path):
         # Send back throttle and steering angle
         message = json.dumps(
             {"throttle": throttle, "steering": steering_angle})
+        print(message)
         await websocket.send(message)
 
 
