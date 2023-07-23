@@ -8,6 +8,7 @@ import base64
 from io import BytesIO
 from lane_line_detection import calculate_control_signal
 
+
 async def echo(websocket, path):
     async for message in websocket:
         # Get image from simulation
@@ -30,10 +31,11 @@ async def echo(websocket, path):
         message = json.dumps({"throttle": throttle, "steering": steering_angle})
         print(message)
         await websocket.send(message)
-        
+
 
 async def main():
     async with websockets.serve(echo, "0.0.0.0", 4567, ping_interval=None):
         await asyncio.Future()  # run forever
+
 
 asyncio.run(main())
