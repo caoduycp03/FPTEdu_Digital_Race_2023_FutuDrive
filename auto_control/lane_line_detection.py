@@ -100,7 +100,7 @@ def calculate_control_signal(img, draw=None):
     # Calculate speed and steering angle
     # The speed is fixed to 50% of the max speed
     # You can try to calculate speed from turning angle
-    throttle = 0.1
+    throttle = 0.2
     steering_angle = 0
     im_center = img.shape[1] // 2
 
@@ -113,11 +113,9 @@ def calculate_control_signal(img, draw=None):
         # Calculate steering angle
         # You can apply some advanced control algorithm here
         # For examples, PID
-        steering_angle = - float(center_diff * 0.01)
+        steering_angle = - float(center_diff * 0.05)
 
         # Clip steering angle
         steering_angle = max(-1, min(1, steering_angle))
-        if abs(steering_angle) < 0.05:
-            steering_angle = 0
 
     return throttle, steering_angle

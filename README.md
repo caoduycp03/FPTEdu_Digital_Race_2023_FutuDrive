@@ -14,7 +14,7 @@ Các đội chơi thực hiện phát triển, tối ưu các thuật toán AI �
 
 Có 2 cách sử dụng giả lập:
 
-- Truy cập giả lập dành cho thử nghiệm tại: [https://daisylab.net/via-sim-2023-07-23/](https://daisylab.net/via-sim-2023-07-23/).
+- Truy cập giả lập dành cho thử nghiệm tại: [https://daisylab.net/via-sim-2023-07-24/](https://daisylab.net/via-sim-2023-07-24/).
 - Truy cập và cài đặt giả lập trên máy tính cá nhân:
   - Windows: [Tải về](https://github.com/makerviet/tfs-auto-algorithms/releases/download/v0.1/VIA-Sim-Windows-2023-07-24.zip);
 
