@@ -16,7 +16,7 @@ Có 2 cách sử dụng giả lập:
 
 - Truy cập giả lập dành cho thử nghiệm tại: [https://daisylab.net/via-sim-2023-07-23/](https://daisylab.net/via-sim-2023-07-23/).
 - Truy cập và cài đặt giả lập trên máy tính cá nhân:
-  - Windows: [Comming Soon](/);
+  - Windows: [Tải về](https://github.com/makerviet/tfs-auto-algorithms/releases/download/v0.1/VIA-Sim-Windows-2023-07-24.zip);
 
 ### 1.2: Mã nguồn điều khiển xe mẫu:
 
