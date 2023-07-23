@@ -34,8 +34,36 @@ Mã nguồn điều khiển sẽ nhận hình ảnh từ giả lập và trả v
 
 ## 2. Tài liệu đào tạo
 
-- Lập trình xe tự hành bám làn: <https://via.makerviet.org/vi/docs/autonomous-on-simulation/hello-via/>.
-- Phát hiện biển báo giao thông: <https://via.makerviet.org/vi/docs/autonomous-on-simulation/traffic-sign-detection/>.
+### 2.1. Làm quen với sổ tay Colab
+
+**Google Colab** là dịch vụ Jupyter Notebook trực tuyến của Google, rất phù hợp để học tập về xử lý ảnh và AI. Trong sổ tay Colab, các bạn có thể vừa ghi chép, vừa chạy thử các đoạn code mẫu.
+
+Truy cập: [https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/01-So-tay-Colab.ipynb](https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/01-So-tay-Colab.ipynb).
+
+### 2.2. OpenCV cơ bản
+
+Bài học này cung cấp các kiến thức cơ bản nhất về xử lý ảnh, cách sử dụng thư viện OpenCV - một thư viện phổ biến trong xử lý ảnh - để đọc, hiển thị và chuyển đổi ảnh giữa các hệ màu khác nhau.
+
+Truy cập: [https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/02-OpenCV-co-ban.ipynb](https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/02-OpenCV-co-ban.ipynb).
+
+### 2.3. Lọc ảnh
+
+Lọc ảnh (làm mịn ảnh, làm mượt ảnh) là một bước rất quan trọng trong xử lý ảnh. Lọc ảnh thực tế có rất nhiều tác dụng như loại bỏ nhiễu, tìm biên đối tượng.
+
+Truy cập: [https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/03-Loc-anh.ipynb](https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/03-Loc-anh.ipynb).
+
+### 2.4. Phát hiện vạch kẻ đường
+
+Ở các bài trước, chúng ta đã được làm quen với các thuật toán xử lý ảnh cơ bản. Các thuật toán này hoàn toàn có thể được áp dụng để phát hiện làn đường trong ảnh hết sức dễ dàng. Ở phần này, chúng ta sẽ cùng xây dựng thuật toán phát hiện vạch kẻ đường từ đầu bằng các kĩ thuật xử lý ảnh như chuyển đổi hệ màu, lọc nhiễu, phát hiện cạnh.
+
+Truy cập: [https://colab.research.google.com/github/makerhanoi/via-course-ai/blob/master/notebooks/04-Phat-hien-vach-ke-duong.ipynb](https://colab.research.google.com/github/makerhanoi/via-course-ai/blob/master/notebooks/04-Phat-hien-vach-ke-duong.ipynb).
+
+### 2.5. Phát hiện biển báo giao thông
+
+Ngoài việc đi đúng phần đường, làn đường của mình, các xe tự lái còn phải tuân thủ các hiệu lệnh giao thông như biển báo, đèn tín hiệu. Ở phần này, chúng ta sẽ ứng dụng các kĩ thuật xử lý ảnh và trí tuệ nhân tạo để phát hiện và phân loại các biển báo có trên đường và điều khiển xe theo chỉ dẫn của các biển báo đó. 
+
+- Truy cập: [https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/05-Phat-hien-bien-bao.ipynb](https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/05-Phat-hien-bien-bao.ipynb).
+- Mở rộng: Huấn luyện phân loại biển báo: [https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/06-Huan-luyen-phan-loai-bien-bao.ipynb](https://colab.research.google.com/github/makerviet/tfs-auto-algorithms/blob/master/notebooks/06-Huan-luyen-phan-loai-bien-bao.ipynb).
 
 ## 3. Đăng ký và nộp bài trên hệ thống
 
