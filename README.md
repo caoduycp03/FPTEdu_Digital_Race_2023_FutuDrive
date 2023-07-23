@@ -14,11 +14,9 @@ Các đội chơi thực hiện phát triển, tối ưu các thuật toán AI �
 
 Có 2 cách sử dụng giả lập:
 
-- Truy cập giả lập dành cho thử nghiệm tại: [https://via-sim.makerviet.org/](https://via-sim.makerviet.org/).
+- Truy cập giả lập dành cho thử nghiệm tại: [https://daisylab.net/via-sim-2023-07-23/](https://daisylab.net/via-sim-2023-07-23/).
 - Truy cập và cài đặt giả lập trên máy tính cá nhân:
   - Windows: [Comming Soon](/);
-  - Linux: [Comming Soon](/);
-  - macOS: [Comming Soon](/).
 
 ### 1.2: Mã nguồn điều khiển xe mẫu:
 
@@ -34,11 +32,11 @@ Mã nguồn điều khiển sẽ nhận hình ảnh từ giả lập và trả v
 
 ![](images/control.png)
 
-## 2. Đăng ký và nộp bài trên hệ thống
-
-Thông tin này sẽ được cập nhật trong thời gian tới
-
-## 3. Tài liệu đào tạo
+## 2. Tài liệu đào tạo
 
 - Lập trình xe tự hành bám làn: <https://via.makerviet.org/vi/docs/autonomous-on-simulation/hello-via/>.
 - Phát hiện biển báo giao thông: <https://via.makerviet.org/vi/docs/autonomous-on-simulation/traffic-sign-detection/>.
+
+## 3. Đăng ký và nộp bài trên hệ thống
+
+Thông tin này sẽ được cập nhật trong thời gian tới.
