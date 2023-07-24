@@ -1,6 +1,6 @@
 # Cuộc đua số 2023 - Thử thách: Thuật toán Tự hành
 
-Trong thử thách này, các đội chơi sẽ phải lập trình thuật toán điều khiển xe tự hành bám làn và đi theo các biển báo giao thông có sẵn, gồm 5 biển: Rễ trái, Rẽ phải, Đi thẳng, Dừng và Cấm.
+Trong thử thách này, các đội chơi sẽ phải lập trình thuật toán điều khiển xe tự hành bám làn và đi theo các biển báo giao thông có sẵn, gồm 5 biển: Rẽ trái (Turn left), Rẽ phải (Turn right), Đi thẳng (Straight), Dừng (Stop) và Cấm (No entry).
 
 Các đội chơi thực hiện phát triển, tối ưu các thuật toán AI để điều khiển xe tự lái trong môi trường giả lập. Trong buổi thi đấu chính thức, mỗi đội sẽ có thời gian 1h để tối ưu thuật toán theo đề bài nhận được từ ban tổ chức.
 
