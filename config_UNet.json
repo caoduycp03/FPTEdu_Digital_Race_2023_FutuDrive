@@ -1,0 +1,33 @@
+{
+    "model" : {
+        "backend":                      "UNET",
+        "im_width":                     128,
+        "im_height":                    128,
+        "out_width":                    128,
+        "out_height":                   128,
+        "classes":                      2
+    },
+
+    "train": {
+        "train_images":                 "./data/train/images",
+        "train_annotations":            "./data/train/masks",
+        "val_images":                   "./data/val/images",
+        "val_annotations":              "./data/val/masks",
+        "train_batch_size":             128,
+        "val_batch_size":               128,
+        "learning_rate":                1e-3,
+        "nb_epochs":                    100,
+        "debug":                        true,
+        "save_model_name" :             "pretrained/UNET_full_road_600k.h5",
+        "load_pretrained_weights":      false,
+        "pretrained_weights_path":      "pretrained/UNET_real_data.h5",
+        "logs_dir" :                    "logs_UNet"
+    },
+
+    "test": {
+        "model_file" :                 "pretrained/UNET_real_data.h5",
+        "test_images":                 "./data/val/images",
+        "test_annotations":            "./data/val/masks",
+        "test_batch_size":              1
+    }
+}

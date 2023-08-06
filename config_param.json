@@ -1,0 +1,14 @@
+{
+    "general" : {
+        "width":                     128,
+        "height":                    128,
+        "width_sign":                320,
+        "height_sign":               240
+    },
+
+    "throttle_04": {
+        "throttle":                     0.8,
+        "model_onnx_path":              "pretrained/UNET_full_road_scratch.059.onnx",
+        "model_detect_sign_path":       "pretrained/acc_84.pt"
+    }
+}
