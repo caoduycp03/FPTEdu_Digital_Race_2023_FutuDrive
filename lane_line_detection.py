@@ -5,7 +5,7 @@ import threading
 import json
 import tensorflow as tf
 import math
-
+import statistics as st
 ###############################################################
 config_path = 'config_param.json'
 with open(config_path) as config_buffer:
@@ -31,11 +31,50 @@ def birdview_transform(img):
     return warped_img
 
 
-left_lt, right_lt = [], []
 def find_left_right_points(image, draw=None):
-    global middle_points, left_lt, right_lt
     # Consider the position 70% from the top of the image
     interested_line_y = int(HEIGHT * 0.7)
+    if draw is not None:
+        cv2.line(draw, (0, interested_line_y),
+                 (WIDTH, interested_line_y), (0, 0, 255), 2)
+    interested_line = image[interested_line_y, :]
+
+    # Detect left/right points
+    left_point = -1
+    right_point = -1
+    lane_width = 48
+    center = WIDTH // 2
+
+    for x in range(0, WIDTH, 1):
+        if interested_line[x] == 1:
+            left_point = x
+            break
+    for x in range(WIDTH-1, 0, -1):
+        if interested_line[x] == 1:
+            right_point = x
+            break
+    '''this end point method apply for 128x128 images, if the height of new image is different
+        multiply the end point with new_height/last_height'''
+    
+    end_point = (68 - (HEIGHT - interested_line_y))/(68 - 0.2*HEIGHT) *17
+    if left_point < end_point and right_point != -1:
+        left_point = left_point - ((WIDTH/2) - (right_point - left_point) )
+
+    if right_point > (128 - end_point) and left_point != -1:
+        right_point = right_point + ((WIDTH/2) - (right_point - left_point) )
+
+    if draw is not None:
+        if left_point != -1:
+            draw = cv2.circle(
+                draw, (int(left_point), interested_line_y), 3, (255, 255, 0), -1)
+        if right_point != -1:
+            draw = cv2.circle(
+                draw, (int(right_point), interested_line_y), 3, (0, 255, 0), -1)
+
+    return left_point, right_point
+def find_left_right_points_2(image, draw=None):
+    # Consider the position 70% from the top of the image
+    interested_line_y = int(HEIGHT * 0.58)
     if draw is not None:
         cv2.line(draw, (0, interested_line_y),
                  (WIDTH, interested_line_y), (0, 0, 255), 2)
@@ -76,7 +115,6 @@ def find_left_right_points(image, draw=None):
     return left_point, right_point
 
 
-
 pred = 0
 def detect_lane_model(model, img):
     global pred
@@ -90,8 +128,22 @@ def detect_lane_model(model, img):
     pred[pred >= 0.5] = 1
     pred[pred < 0.5] = 0
 
+left_list = np.arange(110, 160, 5)
+right_list = np.arange(70, 20, -5)
+time_to_turn = False
+
+sign_list = []
+
+def check_turn():
+    global time_to_turn, sign_list
+    time.sleep(1.1)
+    time_to_turn = False
+    sign_list = []
+
+sign = "hello"
+
 def calculate_control_signal(img, signs, draw=None):
-    global pred
+    global pred, angle_turn, time_to_turn, sign, sign_list, left_list, right_list
 
     #################### predict
     detect_lane = threading.Thread(target=detect_lane_model, args= (model, img))
@@ -103,7 +155,45 @@ def calculate_control_signal(img, signs, draw=None):
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
     left_point, right_point = find_left_right_points(pred_birdview, draw=draw)
+    left_point_2, right_point_2 = find_left_right_points_2(pred_birdview, draw=draw)
+
     angle_degrees = 90
+
+############### control when detect sign
+    angle_turn = 90
+    if signs:
+        print("----------------------------" ,signs)
+        # a = 150
+        sign = signs[-1][0]
+        sign_list.append(sign)
+
+        if st.mode(sign_list) == 'left':
+            angle_turn = left_list[0]
+            left_list = left_list[1:]
+        if st.mode(sign_list) == 'right':
+            angle_turn = right_list[0]
+            right_list = right_list[1:]
+
+        
+        
+    if abs(right_point_2 - left_point_2) > right_point - left_point + 10 and angle_turn != 90:
+        print("fuck")
+        try:
+            print(angle_turn)
+        except: pass
+
+        time_to_turn = True
+        thread = threading.Thread(target= check_turn)
+        thread.start()
+
+    if right_list.size() == 0 or left_list.size() == 0:
+        left_list = np.arange(110, 160, 5)
+        right_list = np.arange(70, 20, -5)
+
+    if time_to_turn:
+        return angle_turn
+###############
+
 
     if left_point != -1 and right_point != -1:
         x1, x2 = left_point, right_point
@@ -119,8 +209,8 @@ def calculate_control_signal(img, signs, draw=None):
             if x3 - x4 > 0:
                 angle_degrees = math.degrees(angle_radians)
             else:
-                angle_degrees = math.degrees(angle_radians) + 180
-    print(angle_degrees)
+                angle_degrees  = math.degrees(angle_radians) + 180
+        # steering = (angle_degrees - 180)/ (0-180) - 1
     return angle_degrees
 
 

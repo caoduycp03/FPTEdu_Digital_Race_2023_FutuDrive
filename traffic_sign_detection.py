@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import math
 
-clas_list = ['unknown', 'right', 'left', 'straight', 'stop', 'no_entry']
+clas_list = ['unknown', 'right', 'left', 'straight', 'stop', 'no_entry', 'car']
 
 def detect_sign(image, model, draw= None):
     signs = []
@@ -13,7 +13,7 @@ def detect_sign(image, model, draw= None):
             x1, y1, x2, y2 = box.xyxy[0]
             x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
 
-            if box.conf[0] > 0:
+            if box.conf[0] > 0.3:
                 clas = box.cls[0]
                 clas = clas_list[math.ceil(clas)]
                 signs.append([clas, x1, y1, x2-x1, y2-y1])
