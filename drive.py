@@ -27,10 +27,25 @@ model_detect_sign_path = config['throttle_04']['model_detect_sign_path']
 model_detect_sign = YOLO(model_detect_sign_path)
 ##############################################################
 
-with open(r'cds-fuzzy-logic/speed_func/normal_throttle_func.pkl', 'rb') as f:
+with open(r'cds_fuzzy_logic/speed_func/normal_throttle_func.pkl', 'rb') as f:
     speed_function = pickle.load(f)
-with open(r'cds-fuzzy-logic/steering_func/steering_func.pkl', 'rb') as f:
+
+with open(r'cds_fuzzy_logic/steering_func/steering_func.pkl', 'rb') as f:
     steering_function = pickle.load(f)
+
+with open(r'cds_fuzzy_logic/speed_func/lr_sign_func.pkl', 'rb') as f:
+    lr_sign_function = pickle.load(f)
+
+with open(r'cds_fuzzy_logic/speed_func/object_func.pkl', 'rb') as f:
+    object_function = pickle.load(f)
+
+with open(r'cds_fuzzy_logic/speed_func/stop_sign_func.pkl', 'rb') as f:
+    stop_sign_function = pickle.load(f)
+
+with open(r'cds_fuzzy_logic/speed_func/straight_sign_func.pkl', 'rb') as f:
+    straight_sign_function = pickle.load(f)
+
+
 
 g_image_queue = Queue(maxsize=50)
 sign_queue = Queue(maxsize=5)
@@ -52,9 +67,10 @@ def process_traffic_sign_loop(g_image_queue, sign_queue):
         cv2.imshow("Traffic signs", draw)
         cv2.waitKey(1)
 
-
+distance_lst = []
 async def process_image(websocket, path):
     async for message in websocket:
+        global distance_lst
         # Get image from simulation
         data = json.loads(message)
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
@@ -96,13 +112,29 @@ async def process_image(websocket, path):
 
         throttle = speed_function(abs(steering)).item()
 
-        # cal distance
-        # if signs:
-            # signs_pos = signs[-1][:]
-            # signs_pos.pop(0)
-            # car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
-            # distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
-            # print("--------------------------", distance)
+        if signs:
+            sign = signs[-1][0]
+            signs_pos = signs[-1][:]
+            signs_pos.pop(0)
+            car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
+            distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
+            distance_lst.append(distance)
+            if distance <=0:
+                distance_lst = []
+
+            distance = distance - 5 / 100 - 5
+
+            #Using steering and distance to determine throttle
+            if signs[-1][0] == 'right' or signs[-1][0] == 'left':
+                throttle = lr_sign_function(distance, steering).item()
+            if signs[-1][0] == 'stop' or signs[-1][0] == 'no_entry':
+                throttle = stop_sign_function(distance, steering).item()
+            if signs[-1][0] == 'straight':
+                throttle = straight_sign_function(distance, steering).item()
+
+        if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
+            distance_lst.pop(-1)
+
 
         cv2.imshow("draw", draw)
         cv2.waitKey(1)

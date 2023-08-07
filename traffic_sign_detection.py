@@ -16,7 +16,7 @@ def detect_sign(image, model, draw= None):
             if box.conf[0] > 0:
                 clas = box.cls[0]
                 clas = clas_list[math.ceil(clas)]
-                signs.append([clas, x1, y1, x2, y2])
+                signs.append([clas, x1, y1, x2-x1, y2-y1])
                 if draw is not None:
                     cv2.rectangle(draw, (x1,y1), (x2,y2), (0,255,0), 3)
                     cv2.putText(draw, clas, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3, cv2.LINE_AA)
@@ -27,12 +27,12 @@ def detect_sign(image, model, draw= None):
 def detect_distance(sign_position, car_position, width, height):
     origin_width = 640
     origin_height = 480
-    convert_rate = 1/1.943
+    
     sign_position = np.array(sign_position)
     car_position = np.array(car_position)
     longest_dis = 418.67
     shortest_dis = 379
-    simulator_longest_dis = 24.5
+    simulator_longest_dis = 80
 
     
 

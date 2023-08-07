@@ -47,11 +47,11 @@ def find_left_right_points(image, draw=None):
     lane_width = 48
     center = WIDTH // 2
 
-    for x in range(0, center+19, 1):
+    for x in range(0, WIDTH, 1):
         if interested_line[x] > 0.6:
             left_point = x
             break
-    for x in range(WIDTH-1, center-20, -1):
+    for x in range(WIDTH-1, 0, -1):
         if interested_line[x] > 0.6:
             right_point = x
             break
