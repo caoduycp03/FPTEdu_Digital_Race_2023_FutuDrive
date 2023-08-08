@@ -105,22 +105,22 @@ def create_speed_function(mode = 'normal_throttle'): #create a function for spee
     if mode == 'object':
         for i, x_value in enumerate(x_values):
             for j, y_value in enumerate(y_values):
-                z_values[i, j] == defuzzify_speed(impediment_rule(), x_value, y_value)
+                z_values[i, j] = defuzzify_speed(impediment_rule(), x_value, y_value)
         curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
     if mode == 'straight_sign':
         for i, x_value in enumerate(x_values):
             for j, y_value in enumerate(y_values):
-                z_values[i, j] == defuzzify_speed(straight_rule(), x_value, y_value)
+                z_values[i, j] = defuzzify_speed(straight_rule(), x_value, y_value)
         curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
     if mode == 'stop_sign':
         for i, x_value in enumerate(x_values):
             for j, y_value in enumerate(y_values):
-                z_values[i, j] == defuzzify_speed(stop_rule(), x_value, y_value)
+                z_values[i, j] = defuzzify_speed(stop_rule(), x_value, y_value)
         curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
     if mode == 'lr_sign':
         for i, x_value in enumerate(x_values):
             for j, y_value in enumerate(y_values):
-                z_values[i, j] == defuzzify_speed(lr_rule(), x_value, y_value)
+                z_values[i, j] = defuzzify_speed(lr_rule(), x_value, y_value)
         curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
     return curve
 
@@ -132,22 +132,32 @@ def create_function(): #create re-usable function
             pickle.dump(func, f)
 
 if __name__ == '__main__':
-    steering.view()
-    plt.show()
-    speed.view()
-    plt.show()
-    dist.view()
-    plt.show()
+    # steering.view()
+    # plt.show()
+    # speed.view()
+    # plt.show()
+    # dist.view()
+    # plt.show()
     
-    # function1 = create_speed_function(mode='normal_throttle')
+    # print(defuzzify_speed(lr_rule(), 0.8, 0.4))
+    # print(defuzzify_speed(lr_rule(), 0.1, 0.5))
 
+    # function1 = create_speed_function(mode='lr_sign')
+
+    # print(function1(0.8, 0.4))
+    # print(function1(0.1, 0.5))
+        
+    # with open(r'cds_fuzzy_logic/speed_func/lr_sign_func.pkl', 'rb') as f:
+    #     lr_sign_function = pickle.load(f)
+    
+    # print(lr_sign_function(1,0.01))
     create_function()
-    
-    # x_values_plot = np.arange(0, 91)
-    # y_values_plot = np.arange(0, 91)
-    # z_values_plot = function1(x_values_plot, y_values_plot)
+    # print(lr_rule())    
+    # x_values_plot = np.arange(0, 1.01, 0.01)
+    # y_values_plot = np.arange(0, 1.01, 0.01)
+    # z_values_plot = lr_sign_function(x_values_plot, y_values_plot)
 
-    # plt.plot(x_values_plot, y_values_plot, z_values_plot)
+    # plt.plot(x_values_plot, y_values_plot)
     # plt.show()
     # x_values_plot = np.arange(0, 1.01, 0.01)
     # y_values_plot = function1(x_values_plot)

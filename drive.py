@@ -119,22 +119,20 @@ async def process_image(websocket, path):
             car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
             distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
             distance_lst.append(distance)
-            if distance <=0:
+            if distance <= 0:
                 distance_lst = []
-
-            distance = distance - 5 / 100 - 5
-
+            
+            distance = (distance - 0) / (100 - 0)
             #Using steering and distance to determine throttle
-            if signs[-1][0] == 'right' or signs[-1][0] == 'left':
-                throttle = lr_sign_function(distance, steering).item()
-            if signs[-1][0] == 'stop' or signs[-1][0] == 'no_entry':
-                throttle = stop_sign_function(distance, steering).item()
-            if signs[-1][0] == 'straight':
-                throttle = straight_sign_function(distance, steering).item()
+            if sign == 'right' or sign == 'left':
+                throttle = lr_sign_function(steering, distance).item()
+            if sign == 'stop' or sign == 'no_entry':
+                throttle = stop_sign_function(steering, distance).item()
+            if sign == 'straight':
+                throttle = straight_sign_function(steering, distance).item()
 
         if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
             distance_lst.pop(-1)
-
 
         cv2.imshow("draw", draw)
         cv2.waitKey(1)

@@ -128,22 +128,20 @@ def detect_lane_model(model, img):
     pred[pred >= 0.5] = 1
     pred[pred < 0.5] = 0
 
-left_list = np.arange(110, 160, 5)
-right_list = np.arange(70, 20, -5)
 time_to_turn = False
-
 sign_list = []
 
 def check_turn():
-    global time_to_turn, sign_list
-    time.sleep(1.1)
+    global time_to_turn, sign_list, angle_turn
+    time.sleep(2)
     time_to_turn = False
     sign_list = []
+    angle_turn = 90
 
 sign = "hello"
-
+angle_turn = 90
 def calculate_control_signal(img, signs, draw=None):
-    global pred, angle_turn, time_to_turn, sign, sign_list, left_list, right_list
+    global pred, angle_turn, time_to_turn, sign, sign_list
 
     #################### predict
     detect_lane = threading.Thread(target=detect_lane_model, args= (model, img))
@@ -160,7 +158,6 @@ def calculate_control_signal(img, signs, draw=None):
     angle_degrees = 90
 
 ############### control when detect sign
-    angle_turn = 90
     if signs:
         print("----------------------------" ,signs)
         # a = 150
@@ -168,32 +165,23 @@ def calculate_control_signal(img, signs, draw=None):
         sign_list.append(sign)
 
         if st.mode(sign_list) == 'left':
-            angle_turn = left_list[0]
-            left_list = left_list[1:]
+            angle_turn = 150
         if st.mode(sign_list) == 'right':
-            angle_turn = right_list[0]
-            right_list = right_list[1:]
-
-        
-        
-    if abs(right_point_2 - left_point_2) > right_point - left_point + 10 and angle_turn != 90:
-        print("fuck")
-        try:
-            print(angle_turn)
-        except: pass
-
-        time_to_turn = True
-        thread = threading.Thread(target= check_turn)
-        thread.start()
-
-    if right_list.size() == 0 or left_list.size() == 0:
-        left_list = np.arange(110, 160, 5)
-        right_list = np.arange(70, 20, -5)
+            angle_turn = 30
+    
+    if len(sign_list) > 0:    
+        if (st.mode(sign_list) == 'left' and left_point_2 - left_point > 5) or (st.mode(sign_list) == 'right' and right_point_2 - right_point > 5):
+            print('angle', angle_turn)
+            time_to_turn = True
+            thread = threading.Thread(target= check_turn)
+            thread.start()
+    
+    # if (right_point_2 - left_point_2) - (right_point - left_point) < 5:
+    #     time_to_turn = False
 
     if time_to_turn:
         return angle_turn
 ###############
-
 
     if left_point != -1 and right_point != -1:
         x1, x2 = left_point, right_point
@@ -210,7 +198,6 @@ def calculate_control_signal(img, signs, draw=None):
                 angle_degrees = math.degrees(angle_radians)
             else:
                 angle_degrees  = math.degrees(angle_radians) + 180
-        # steering = (angle_degrees - 180)/ (0-180) - 1
     return angle_degrees
 
 
