@@ -47,10 +47,11 @@ with open(r'cds_fuzzy_logic/speed_func/straight_sign_func.pkl', 'rb') as f:
 
 
 
-g_image_queue = Queue(maxsize=50)
+g_image_queue = Queue(maxsize=5)
 sign_queue = Queue(maxsize=5)
+car_queue = Queue(maxsize= 5)
 
-def process_traffic_sign_loop(g_image_queue, sign_queue):
+def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
     while True:
         if g_image_queue.empty():
             time.sleep(0.1)
@@ -59,10 +60,14 @@ def process_traffic_sign_loop(g_image_queue, sign_queue):
         # Prepare visualization image
         draw = image.copy()
         # Detect traffic signs
-        sign = detect_sign(image, model_detect_sign, draw=draw)
+        sign, car = detect_sign(image, model_detect_sign, draw=draw)
         if sign:
             if not sign_queue.full():
                 sign_queue.put(sign)
+
+        if car:
+            if not car_queue.full():
+                car_queue.put(car)   
         # Show the result to a window
         cv2.imshow("Traffic signs", draw)
         cv2.waitKey(1)
@@ -99,9 +104,14 @@ async def process_image(websocket, path):
         else:
             signs = []
 
+        if not car_queue.empty():
+            cars = car_queue.get()
+        else:
+            cars = []
+
         # Send back throttle and steering angle
         # print("----------------------------", signs)
-        angle = calculate_control_signal(image_lane, signs, draw=draw)
+        angle = calculate_control_signal(image_lane, signs, cars, draw=draw)
         
         if angle > 90:
             angle = angle - 90
@@ -148,6 +158,6 @@ async def main():
         await asyncio.Future()  # run forever
 
 if __name__ == '__main__':
-    p = Process(target=process_traffic_sign_loop, args=(g_image_queue, sign_queue))
+    p = Process(target=process_traffic_sign_loop, args=(g_image_queue, sign_queue, car_queue))
     p.start()
     asyncio.run(main())

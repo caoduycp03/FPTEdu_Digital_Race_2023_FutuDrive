@@ -6,6 +6,7 @@ clas_list = ['unknown', 'right', 'left', 'straight', 'stop', 'no_entry', 'car']
 
 def detect_sign(image, model, draw= None):
     signs = []
+    cars = []
     results = model(image, verbose=False)
     for result in results:
         boxes = result.boxes
@@ -13,15 +14,18 @@ def detect_sign(image, model, draw= None):
             x1, y1, x2, y2 = box.xyxy[0]
             x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
 
-            if box.conf[0] > 0.3:
+            if box.conf[0] > 0.5:
                 clas = box.cls[0]
                 clas = clas_list[math.ceil(clas)]
-                signs.append([clas, x1, y1, x2-x1, y2-y1])
+                if clas == 'car':
+                    cars.append([clas, x1, y1, x2-x1, y2-y1])
+                else:   
+                    signs.append([clas, x1, y1, x2-x1, y2-y1])
+                    
                 if draw is not None:
                     cv2.rectangle(draw, (x1,y1), (x2,y2), (0,255,0), 3)
                     cv2.putText(draw, clas, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3, cv2.LINE_AA)
-
-    return signs
+    return signs, cars
     
     
 def detect_distance(sign_position, car_position, width, height):

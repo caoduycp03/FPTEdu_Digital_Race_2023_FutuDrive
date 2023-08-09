@@ -3,7 +3,6 @@ import numpy as np
 import time
 import threading
 import json
-import tensorflow as tf
 import math
 import statistics as st
 ###############################################################
@@ -88,16 +87,16 @@ def detect_lane_model(model, img):
 time_to_turn = False
 sign_list = []
 
-# def check_turn():
-#     global time_to_turn, sign_list, angle_turn
-#     time.sleep(5)
-#     time_to_turn = False
-#     sign_list = []
-#     angle_turn = 90
+def check_turn():
+    global time_to_turn, sign_list, angle_turn
+    time.sleep(0.3)
+    time_to_turn = False
+    sign_list = []
+    angle_turn = 90
 
 sign = "hello"
 angle_turn = 90
-def calculate_control_signal(img, signs, draw=None):
+def calculate_control_signal(img, signs, cars, draw=None):
     global pred, angle_turn, time_to_turn, sign, sign_list
 
     #################### predict
@@ -119,15 +118,14 @@ def calculate_control_signal(img, signs, draw=None):
 ############### control when detect sign
     if signs:
         sign = signs[-1][0]
-        print(sign)
         sign_list.append(sign)
-
         if st.mode(sign_list) == 'left':
             angle_turn = 150
         if st.mode(sign_list) == 'right':
             angle_turn = 30
     
-    if len(sign_list) > 0:    
+    if len(sign_list) > 0:   
+        print(st.mode(sign_list)) 
         if (st.mode(sign_list) == 'left' and left_point_2 - left_point > 5) or (st.mode(sign_list) == 'right' and right_point_2 - right_point > 5):
             time_to_turn = True
             # thread = threading.Thread(target= check_turn)
@@ -135,9 +133,8 @@ def calculate_control_signal(img, signs, draw=None):
     
     if time_to_turn and abs(center_road - car_location) < 20:
     #abs(np.sum(pred_birdview[:,:WIDTH//2-1]) - np.sum(pred_birdview[:,WIDTH//2:WIDTH-1])) < 20: 
-        time_to_turn = False
-        sign_list = []
-        angle_turn = 90
+        sleep = threading.Thread(target= check_turn)
+        sleep.start()
         print('duy dep trai')
     
     if time_to_turn:
