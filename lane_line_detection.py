@@ -85,19 +85,13 @@ def detect_lane_model(model, img):
     pred[pred < 0.5] = 0
 
 time_to_turn = False
+check_distance = False
 sign_list = []
-
-def check_turn():
-    global time_to_turn, sign_list, angle_turn
-    time.sleep(0.3)
-    time_to_turn = False
-    sign_list = []
-    angle_turn = 90
 
 sign = "hello"
 angle_turn = 90
-def calculate_control_signal(img, signs, cars, draw=None):
-    global pred, angle_turn, time_to_turn, sign, sign_list
+def calculate_control_signal(img, signs, cars, distance, draw=None):
+    global pred, angle_turn, time_to_turn, sign, sign_list, check_distance
 
     #################### predict
     detect_lane = threading.Thread(target=detect_lane_model, args= (model, img))
@@ -108,37 +102,50 @@ def calculate_control_signal(img, signs, cars, draw=None):
     cv2.imshow("pred_birdview", pred_birdview)
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
-    left_point, right_point = find_left_right_points(0.6, pred_birdview, draw=draw)
-    left_point_2, right_point_2 = find_left_right_points(0.7, pred_birdview, draw=draw)
-    left_point_3, right_point_3 = find_left_right_points(0.2, pred_birdview, draw=draw)
-
+    left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
+    left_point_2, right_point_2 = find_left_right_points(0.55, pred_birdview, draw=draw)
+    left_point_3, right_point_3 = find_left_right_points(0.9, pred_birdview, draw=draw)
+    lane_width = 42
     angle_degrees = 90
-    car_location = WIDTH//2
-    center_road = (left_point_3 + right_point_3)/2
 ############### control when detect sign
     if signs:
         sign = signs[-1][0]
         sign_list.append(sign)
         if st.mode(sign_list) == 'left':
-            angle_turn = 150
+            angle_turn = 145
         if st.mode(sign_list) == 'right':
-            angle_turn = 30
+            angle_turn = 35
     
+    print(distance)
+    if distance:
+        if distance <= 50:
+            check_distance = True
+
     if len(sign_list) > 0:   
         print(st.mode(sign_list)) 
         if (st.mode(sign_list) == 'left' and left_point_2 - left_point > 5) or (st.mode(sign_list) == 'right' and right_point_2 - right_point > 5):
-            time_to_turn = True
-            # thread = threading.Thread(target= check_turn)
-            # thread.start()
+            print('duy pro')
+            if check_distance:
+                time_to_turn = True
     
-    if time_to_turn and abs(center_road - car_location) < 20:
+
+
+    if time_to_turn and abs(right_point - left_point) <= lane_width and abs(right_point_2 - left_point_2) <= lane_width and abs(left_point_3 - right_point_3) <= lane_width:
     #abs(np.sum(pred_birdview[:,:WIDTH//2-1]) - np.sum(pred_birdview[:,WIDTH//2:WIDTH-1])) < 20: 
-        sleep = threading.Thread(target= check_turn)
-        sleep.start()
         print('duy dep trai')
-    
-    if time_to_turn:
+        print(abs(right_point - left_point))
+        print(abs(right_point_2 - left_point_2))
+        print(abs(left_point_3 - right_point_3))
+        time_to_turn = False
+        check_distance = False
+        sign_list = []
+        angle_turn = 90
+
+    if time_to_turn and check_distance:
         print(angle_turn)
+        print(abs(right_point - left_point))
+        print(abs(right_point_2 - left_point_2))
+        print(abs(left_point_3 - right_point_3))
         return angle_turn
 ###############
 

@@ -111,7 +111,20 @@ async def process_image(websocket, path):
 
         # Send back throttle and steering angle
         # print("----------------------------", signs)
-        angle = calculate_control_signal(image_lane, signs, cars, draw=draw)
+        distance = None
+        if signs:
+            sign = signs[-1][0]
+            signs_pos = signs[-1][:]
+            signs_pos.pop(0)
+            car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
+            distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
+            distance_lst.append(distance)
+            if distance <= 0:
+                distance_lst = []
+            if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
+                distance_lst.pop(-1)
+
+        angle = calculate_control_signal(image_lane, signs, cars, distance, draw=draw)
         
         if angle > 90:
             angle = angle - 90
@@ -122,16 +135,8 @@ async def process_image(websocket, path):
 
         throttle = speed_function(abs(steering)).item()
 
+
         if signs:
-            sign = signs[-1][0]
-            signs_pos = signs[-1][:]
-            signs_pos.pop(0)
-            car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
-            distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
-            distance_lst.append(distance)
-            if distance <= 0:
-                distance_lst = []
-            
             distance = (distance - 0) / (100 - 0)
             #Using steering and distance to determine throttle
             if sign == 'right' or sign == 'left':
@@ -140,9 +145,7 @@ async def process_image(websocket, path):
                 throttle = stop_sign_function(steering, distance).item()
             if sign == 'straight':
                 throttle = straight_sign_function(steering, distance).item()
-
-        if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
-            distance_lst.pop(-1)
+        
 
         cv2.imshow("draw", draw)
         cv2.waitKey(1)
