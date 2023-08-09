@@ -46,3 +46,4 @@ if time.sleep(5):
         if right_point == -1 and left_point == -1:
             left_point, right_point = points[-1]
             print('hal9')
+            print('hi')
