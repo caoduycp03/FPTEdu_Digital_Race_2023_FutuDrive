@@ -9,7 +9,7 @@ import numpy as np
 import websockets
 from PIL import Image
 from lane_line_detection import calculate_control_signal
-from traffic_sign_detection import detect_sign, detect_distance
+from traffic_sign_detection import detect_sign, detect_distance, counter_car
 import pickle
 from ultralytics import YOLO
 
@@ -42,9 +42,11 @@ with open(r'cds_fuzzy_logic/speed_func/object_func.pkl', 'rb') as f:
 with open(r'cds_fuzzy_logic/speed_func/stop_sign_func.pkl', 'rb') as f:
     stop_sign_function = pickle.load(f)
 
+with open(r'cds_fuzzy_logic/speed_func/noentry_sign_func.pkl', 'rb') as f:
+    noentry_sign_function = pickle.load(f)
+
 with open(r'cds_fuzzy_logic/speed_func/straight_sign_func.pkl', 'rb') as f:
     straight_sign_function = pickle.load(f)
-
 
 
 g_image_queue = Queue(maxsize=5)
@@ -124,7 +126,26 @@ async def process_image(websocket, path):
             if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
                 distance_lst.pop(-1)
 
-        angle = calculate_control_signal(image_lane, signs, cars, distance, draw=draw)
+        lst_car = []
+        if cars:
+            sign_pos = []
+            number = "NO"
+            if len(cars) == 1:
+                sign_pos = cars[-1][:]
+                sign_pos.pop(0)
+                number = 'small'
+            else:
+                sign_pos = cars[-2:][:]
+                for item in sign_pos:
+                    item.pop(0)
+                number = 'big'
+            print("before",sign_pos)
+                
+            distance_car, right, left = counter_car(sign_pos, 320, 240, number)
+            lst_car = [distance_car, right, left]
+            print('-----------', lst_car)
+
+        angle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
         
         if angle > 90:
             angle = angle - 90
@@ -135,16 +156,22 @@ async def process_image(websocket, path):
 
         throttle = speed_function(abs(steering)).item()
 
-
         if signs:
             distance = (distance - 0) / (100 - 0)
             #Using steering and distance to determine throttle
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
-            if sign == 'stop' or sign == 'no_entry':
+            if sign == 'stop':
                 throttle = stop_sign_function(steering, distance).item()
+            if sign  == 'noentry':
+                throttle = noentry_sign_function(steering, distance).item()
             if sign == 'straight':
                 throttle = straight_sign_function(steering, distance).item()
+        
+        if len(lst_car) != 0:
+            distance = lst_car[0]
+            distance = (distance - 120) / (240 - 120)
+            throttle = object_function(steering, distance).item()
         
 
         cv2.imshow("draw", draw)

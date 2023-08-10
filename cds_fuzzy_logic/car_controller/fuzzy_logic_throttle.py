@@ -83,6 +83,14 @@ def lr_rule():
         lr_rules.append(rule)
     return lr_rules
 
+def noentry_rule():
+    rules = rr.read_noentry_rule()
+    noentry_rules = []
+    for item in rules:
+        rule = ctrl.Rule(dist[item[0]] & steering[item[1]], speed[item[2]])
+        noentry_rules.append(rule)
+    return noentry_rules
+
 #Inference + Defuzzification to calculate speed
 def defuzzify_speed(rule, steering_value, distance_value = None): # + dist_value
     cmd_ctrl = ctrl.ControlSystem(rule)
@@ -122,10 +130,15 @@ def create_speed_function(mode = 'normal_throttle'): #create a function for spee
             for j, y_value in enumerate(y_values):
                 z_values[i, j] = defuzzify_speed(lr_rule(), x_value, y_value)
         curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
+    if mode == 'noentry_sign':
+        for i, x_value in enumerate(x_values):
+            for j, y_value in enumerate(y_values):
+                z_values[i, j] = defuzzify_speed(noentry_rule(), x_value, y_value)
+        curve = interpolate.RectBivariateSpline(x_values, y_values, z_values)
     return curve
 
 def create_function(): #create re-usable function
-    mode_list = ['normal_throttle', 'object', 'straight_sign', 'stop_sign', 'lr_sign'] 
+    mode_list = ['object'] 
     for mode in mode_list:
         func = create_speed_function(mode)
         with open (f'cds_fuzzy_logic/speed_func/{mode}_func.pkl', 'wb') as f: 

@@ -50,3 +50,65 @@ def detect_distance(sign_position, car_position, width, height):
     distance_2d = ((center_sign[0] - car_position[0])**2 + (center_sign[1] - car_position[1])**2)**(1/2)
     simulator_dis = simulator_longest_dis - simulator_longest_dis*((longest_dis-distance_2d)/(longest_dis-shortest_dis))
     return simulator_dis
+
+
+def counter_car(signs_pos, width, height, number):
+    
+    print('1')
+    if number == 'NO':
+        return None, None, None
+    if number == 'small':
+        chosen_signs = signs_pos
+        
+    
+    else: 
+        print('bigger', signs_pos)
+        chosen_signs = signs_pos[0]
+        
+        if signs_pos[1][2] > signs_pos[0][2]:
+            chosen_signs  = signs_pos[1]
+            
+            
+
+    print('final',chosen_signs)
+
+    origin_width = 320
+    origin_height = 240
+    chosen_signs = np.array(chosen_signs)
+    
+
+    longest_dis = 170
+    shortest_dis = 0
+    simulator_longest_dis = 100
+
+
+    chosen_signs[0], chosen_signs[1] = (chosen_signs[0] *float(origin_width/width)), (chosen_signs[1] *float(origin_height/height))
+    chosen_signs[2], chosen_signs[3] = (chosen_signs[2] *float(origin_width/width)), (chosen_signs[3] *float(origin_height/height))
+
+    right = False
+    left = False
+    
+    #center_sign = [(chosen_signs[0] + chosen_signs[2])/2, (chosen_signs[1] + chosen_signs[3])/2]
+
+    distance_2d = 100
+    if chosen_signs[0] + chosen_signs[2]/2 < width/2:
+        left = True
+        if chosen_signs[0] > chosen_signs[2]:
+            distance_2d = (((chosen_signs[0]-chosen_signs[2]))**2 + ((chosen_signs[1]-chosen_signs[3]))**2)**(1/2)
+            print('left', distance_2d)
+        else:
+            distance_2d = chosen_signs[0]/2.5
+            print('left', distance_2d)
+        
+
+    if chosen_signs[0] + chosen_signs[2]/2 > width/2:
+        right = True
+        distance_2d = ((chosen_signs[0] + chosen_signs[2] -290)**2 + ((chosen_signs[1]))**2)**(1/2)
+        print('--------right', distance_2d)
+       
+    
+    #simu_dis = simu_dis - simu_dis*(distance_2d/(longest_dis - shortest_dis))
+    
+    return distance_2d, right, left
+
+

@@ -29,6 +29,20 @@ def birdview_transform(img):
     warped_img = cv2.warpPerspective(img, M, (WIDTH, HEIGHT)) # Image warping
     return warped_img
 
+def modify_left_right(left, right):
+    if abs(left - right) > 50:
+        print(left, right)
+        print('try')
+        center = WIDTH / 2
+        lane_width = 44
+        if abs(left - center) > abs(right - center):
+            left = right - lane_width
+        elif abs(left - center) < abs(right - center):
+            right = left + lane_width
+    print(left, right)
+    return left, right
+
+
 def find_left_right_points(roi, image, draw=None):
     # Consider the position 70% from the top of the image
     interested_line_y = int(HEIGHT * roi)
@@ -87,11 +101,11 @@ def detect_lane_model(model, img):
 time_to_turn = False
 check_distance = False
 sign_list = []
-
+check_move = True
 sign = "hello"
 angle_turn = 90
-def calculate_control_signal(img, signs, cars, distance, draw=None):
-    global pred, angle_turn, time_to_turn, sign, sign_list, check_distance
+def calculate_control_signal(img, signs, lst_car, distance, draw=None):
+    global pred, angle_turn, time_to_turn, sign, sign_list, check_distance, check_move
 
     #################### predict
     detect_lane = threading.Thread(target=detect_lane_model, args= (model, img))
@@ -103,32 +117,41 @@ def calculate_control_signal(img, signs, cars, distance, draw=None):
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
     left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
-    left_point_2, right_point_2 = find_left_right_points(0.55, pred_birdview, draw=draw)
+    left_point_2, right_point_2 = find_left_right_points(0.6, pred_birdview, draw=draw)
     left_point_3, right_point_3 = find_left_right_points(0.9, pred_birdview, draw=draw)
+    left_point_4, right_point_4 = find_left_right_points(0.3, pred_birdview, draw=draw)
+    
     lane_width = 42
     angle_degrees = 90
+    center = WIDTH / 2
+    left_root = center - 20
+    right_root = center + 20
+
+    if check_move and left_point_4 - center > -15 and right_point_4 - center > 15:
+        left_point, right_point = modify_left_right(left_point, right_point)
+
+
 ############### control when detect sign
     if signs:
         sign = signs[-1][0]
         sign_list.append(sign)
         if st.mode(sign_list) == 'left':
-            angle_turn = 145
+            angle_turn = 150
         if st.mode(sign_list) == 'right':
-            angle_turn = 35
+            angle_turn = 30
     
-    print(distance)
     if distance:
         if distance <= 50:
             check_distance = True
 
     if len(sign_list) > 0:   
         print(st.mode(sign_list)) 
-        if (st.mode(sign_list) == 'left' and left_point_2 - left_point > 5) or (st.mode(sign_list) == 'right' and right_point_2 - right_point > 5):
+        if (st.mode(sign_list) == 'left' and abs(left_point_2 - left_point) > 5) or (st.mode(sign_list) == 'right' and abs(right_point_2 - right_point) > 5):
             print('duy pro')
             if check_distance:
                 time_to_turn = True
+                check_move = False
     
-
 
     if time_to_turn and abs(right_point - left_point) <= lane_width and abs(right_point_2 - left_point_2) <= lane_width and abs(left_point_3 - right_point_3) <= lane_width:
     #abs(np.sum(pred_birdview[:,:WIDTH//2-1]) - np.sum(pred_birdview[:,WIDTH//2:WIDTH-1])) < 20: 
@@ -138,6 +161,7 @@ def calculate_control_signal(img, signs, cars, distance, draw=None):
         print(abs(left_point_3 - right_point_3))
         time_to_turn = False
         check_distance = False
+        check_move = True
         sign_list = []
         angle_turn = 90
 
@@ -148,6 +172,20 @@ def calculate_control_signal(img, signs, cars, distance, draw=None):
         print(abs(left_point_3 - right_point_3))
         return angle_turn
 ###############
+
+
+    if lst_car:
+        if lst_car[1] == True and lst_car[0] < 130:
+            center_1 = (right_point + left_point)/2
+            right_point = (center_1 + left_point)/2
+            
+            
+            print('avoid right')
+            
+        if lst_car[2] == True and lst_car[0] < 120:
+            center_1 = (right_point + left_point)/2
+            left_point = (center_1 + right_point)/2
+            print('avoid left')
 
     if left_point != -1 and right_point != -1:
         x1, x2 = left_point, right_point

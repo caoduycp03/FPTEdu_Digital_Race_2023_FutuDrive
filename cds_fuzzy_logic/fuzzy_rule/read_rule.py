@@ -69,11 +69,24 @@ def read_lr_rule():
 
     return lr_rule
 
+def read_noentry_rule():
+    noentry_rule = []
+    book = openpyxl.load_workbook(r'cds_fuzzy_logic/fuzzy_rule/rule(main).xlsx')
+    sheet = book.worksheets[5]
+
+    distance = [cell[0] for cell in sheet.iter_rows(min_col=2, min_row=1, max_row=10, values_only=True)]
+    steering = [cell[0] for cell in sheet.iter_rows(min_col=3, min_row=1, max_row=10, values_only=True)]
+    speed = [cell[0] for cell in sheet.iter_rows(min_col=4, min_row=1, max_row=10, values_only=True)]
+
+    for i in range(1, len(distance)):
+        noentry_rule.append((distance[i], steering[i], speed[i]))
+
+    return noentry_rule
 
 def read_steering_rule():
     steering_rule = []
     book = openpyxl.load_workbook(r'cds_fuzzy_logic/fuzzy_rule/rule(main).xlsx')
-    sheet = book.worksheets[5]
+    sheet = book.worksheets[6]
 
     angle = [cell[0] for cell in sheet.iter_rows(min_col=2, min_row=1, max_row=6, values_only=True)]
     steering = [cell[0] for cell in sheet.iter_rows(min_col=3, min_row=1, max_row=6, values_only=True)]
