@@ -8,10 +8,11 @@ import cv2
 import numpy as np
 import websockets
 from PIL import Image
-from lane_line_detection import calculate_control_signal
+from lane_line_detection import calculate_control_signal, find_left_right_points, birdview_transform
 from traffic_sign_detection import detect_sign, detect_distance, counter_car
 import pickle
 from ultralytics import YOLO
+import statistics as st
 
 
 ###############################################################
@@ -75,9 +76,12 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
         cv2.waitKey(1)
 
 distance_lst = []
+sign_lst = []
+
+
 async def process_image(websocket, path):
     async for message in websocket:
-        global distance_lst
+        global distance_lst, sign_lst
         # Get image from simulation
         data = json.loads(message)
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
@@ -113,19 +117,31 @@ async def process_image(websocket, path):
 
         # Send back throttle and steering angle
         # print("----------------------------", signs)
+
+        #calculate the distance for signs
         distance = None
         if signs:
+
             sign = signs[-1][0]
+
+            sign_lst.append(sign)
+
             signs_pos = signs[-1][:]
             signs_pos.pop(0)
             car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
             distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
+            if distance < 0:
+                distance = 0
+            #print(distance_lst)
             distance_lst.append(distance)
-            if distance <= 0:
-                distance_lst = []
+            
             if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
                 distance_lst.pop(-1)
+        if distance_lst:
+            distance = distance_lst[-1]
+        #print('True distance', distance)
 
+        #calculate the distance for car
         lst_car = []
         if cars:
             sign_pos = []
@@ -139,14 +155,18 @@ async def process_image(websocket, path):
                 for item in sign_pos:
                     item.pop(0)
                 number = 'big'
-            print("before",sign_pos)
+            
                 
             distance_car, right, left = counter_car(sign_pos, 320, 240, number)
             lst_car = [distance_car, right, left]
-            print('-----------', lst_car)
+            
 
-        angle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
-        
+        # decide how car will go
+        angle, check_discard= calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
+        if check_discard == True:
+            distance_lst = []
+            sign_lst = []
+
         if angle > 90:
             angle = angle - 90
             steering = - steering_function(angle).item()
@@ -156,7 +176,8 @@ async def process_image(websocket, path):
 
         throttle = speed_function(abs(steering)).item()
 
-        if signs:
+        if len(sign_lst) !=0:
+            sign = st.mode(sign_lst)
             distance = (distance - 0) / (100 - 0)
             #Using steering and distance to determine throttle
             if sign == 'right' or sign == 'left':
@@ -169,10 +190,10 @@ async def process_image(websocket, path):
                 throttle = straight_sign_function(steering, distance).item()
         
         if len(lst_car) != 0:
-            distance = lst_car[0]
-            distance = (distance - 120) / (240 - 120)
-            throttle = object_function(steering, distance).item()
-        
+            distance_car = lst_car[0]
+            distance_car = (distance_car - 0) / (240 - 0)
+            throttle = object_function(steering, distance_car).item()
+    
 
         cv2.imshow("draw", draw)
         cv2.waitKey(1)

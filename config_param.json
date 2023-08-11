@@ -8,7 +8,7 @@
 
     "throttle_04": {
         "throttle":                     0.8,
-        "model_onnx_path":              "pretrained/UNET_full_road_scratch.044.onnx",
-        "model_detect_sign_path":       "pretrained/acc_98.pt"
+        "model_onnx_path":              "pretrained/UNET_aug_pre29.025.onnx",
+        "model_detect_sign_path":       "pretrained/acc_99.pt"
     }
 }

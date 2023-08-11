@@ -34,7 +34,7 @@ def detect_distance(sign_position, car_position, width, height):
     
     sign_position = np.array(sign_position)
     car_position = np.array(car_position)
-    longest_dis = 418.67
+    longest_dis = 425
     shortest_dis = 379
     simulator_longest_dis = 80
 
@@ -95,16 +95,16 @@ def counter_car(signs_pos, width, height, number):
         left = True
         if chosen_signs[0] > chosen_signs[2]:
             distance_2d = (((chosen_signs[0]-chosen_signs[2]))**2 + ((chosen_signs[1]-chosen_signs[3]))**2)**(1/2)
-            print('left', distance_2d)
+            
         else:
             distance_2d = chosen_signs[0]/2.5
-            print('left', distance_2d)
+          
         
 
     if chosen_signs[0] + chosen_signs[2]/2 > width/2:
         right = True
         distance_2d = ((chosen_signs[0] + chosen_signs[2] -290)**2 + ((chosen_signs[1]))**2)**(1/2)
-        print('--------right', distance_2d)
+        
        
     
     #simu_dis = simu_dis - simu_dis*(distance_2d/(longest_dis - shortest_dis))
