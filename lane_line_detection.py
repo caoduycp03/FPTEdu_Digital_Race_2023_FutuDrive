@@ -113,7 +113,7 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
     cv2.imshow("pred_birdview", pred_birdview)
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
-    left_point, right_point = find_left_right_points(0.5, pred_birdview, draw=draw)
+    left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
     left_point_2, right_point_2 = find_left_right_points(0.9, pred_birdview, draw=draw)
     left_point_3, right_point_3 = find_left_right_points(0.95, pred_birdview, draw=draw)
     left_point_4, right_point_4 = find_left_right_points(0.3, pred_birdview, draw=draw)
@@ -125,7 +125,7 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
     angle_degrees = 90
     center = WIDTH / 2
 
-    if check_move and left_point_4 - center > -15 and right_point_4 - center > 15:
+    if check_move and left_point_4 - center > -22 and right_point_4 - center < 22:
         left_point, right_point = modify_left_right(left_point, right_point)
     
 ############### control when detect sign

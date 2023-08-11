@@ -190,7 +190,8 @@ async def process_image(websocket, path):
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
             if sign == 'stop':
-                throttle = stop_sign_function(steering, distance).item()
+                # throttle = stop_sign_function(steering, distance).item()
+                throttle = 0
             if sign  == 'noentry':
                 throttle = noentry_sign_function(steering, distance).item()
             if sign == 'straight':

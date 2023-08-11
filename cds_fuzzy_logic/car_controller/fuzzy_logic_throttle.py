@@ -38,8 +38,8 @@ speed = ctrl.Consequent(np.arange(0, 0.51, 0.01), 'speed')
 
 speed[STOP] = fuzz.trimf(speed.universe, [0, 0, 0])
 speed[SLOW] = fuzz.trapmf(speed.universe, [0, 0, 0.125, 0.25])
-speed[MEDIUM] = fuzz.trapmf(speed.universe, [0.125, 0.25, 0.375, 0.5])
-speed[FAST] = fuzz.trapmf(speed.universe, [0.375, 0.5, 0.5, 0.5])
+speed[MEDIUM] = fuzz.trapmf(speed.universe, [0.125, 0.25, 0.35, 0.4])
+speed[FAST] = fuzz.trapmf(speed.universe, [0.35, 0.4, 0.4, 0.4])
 
 
 #Create rule for inference
@@ -160,17 +160,17 @@ if __name__ == '__main__':
     # print(function1(0.8, 0.4))
     # print(function1(0.1, 0.5))
         
-    with open(r'cds_fuzzy_logic/speed_func/lr_sign_func.pkl', 'rb') as f:
-        lr_sign_function = pickle.load(f)
-    
-    print(lr_sign_function(0,0.45))
-    # create_function()
+    # with open(r'cds_fuzzy_logic/speed_func/stop_sign_func.pkl', 'rb') as f:
+    #     stop_sign_function = pickle.load(f)
+
+    # print(stop_sign_function(0,0.03))
+    create_function()
     # print(lr_rule())    
     # x_values_plot = np.arange(0, 1.01, 0.01)
     # y_values_plot = np.arange(0, 1.01, 0.01)
-    # z_values_plot = lr_sign_function(x_values_plot, y_values_plot)
+    # z_values_plot = stop_sign_function(x_values_plot, y_values_plot)
 
-    # plt.plot(x_values_plot, y_values_plot)
+    # plt.plot(z_values_plot)
     # plt.show()
     # x_values_plot = np.arange(0, 1.01, 0.01)
     # y_values_plot = function1(x_values_plot)

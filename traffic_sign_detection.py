@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+import torch
 
 clas_list = ['unknown', 'right', 'left', 'straight', 'stop', 'no_entry', 'car']
 
@@ -24,7 +25,7 @@ def detect_sign(image, model, draw= None):
                     
                 if draw is not None:
                     cv2.rectangle(draw, (x1,y1), (x2,y2), (0,255,0), 3)
-                    cv2.putText(draw, clas, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3, cv2.LINE_AA)
+                    cv2.putText(draw, clas + f" {str(round(float(box.conf[0]), 2))}", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 3, cv2.LINE_AA)
     return signs, cars
     
     
