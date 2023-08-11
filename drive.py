@@ -78,7 +78,6 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
 distance_lst = []
 sign_lst = []
 
-
 async def process_image(websocket, path):
     async for message in websocket:
         global distance_lst, sign_lst
@@ -121,9 +120,7 @@ async def process_image(websocket, path):
         #calculate the distance for signs
         distance = None
         if signs:
-
             sign = signs[-1][0]
-
             sign_lst.append(sign)
 
             signs_pos = signs[-1][:]
@@ -139,6 +136,14 @@ async def process_image(websocket, path):
                 distance_lst.pop(-1)
         if distance_lst:
             distance = distance_lst[-1]
+        
+        #discard straight, no entry when go through
+        if len(sign_lst) > 0:
+            sign = st.mode(sign_lst)
+            if (sign == 'straight' and distance < 10) or (sign == 'no_entry' and distance < 10):
+                distance_lst =[]
+                sign_lst = []
+
         #print('True distance', distance)
 
         #calculate the distance for car
@@ -178,7 +183,9 @@ async def process_image(websocket, path):
 
         if len(sign_lst) !=0:
             sign = st.mode(sign_lst)
+            print(distance)
             distance = (distance - 0) / (100 - 0)
+    
             #Using steering and distance to determine throttle
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()

@@ -98,12 +98,11 @@ time_to_turn = False
 check_distance = False
 sign_list = []
 check_move = True
-sign = "hello"
 angle_turn = 90
 car_location = None
 
 def calculate_control_signal(img, signs, lst_car, distance, draw=None):
-    global pred, angle_turn, time_to_turn, sign, sign_list, check_distance, check_move, car_location
+    global pred, angle_turn, time_to_turn, sign_list, check_distance, check_move, car_location
 
     #################### predict
     detect_lane = threading.Thread(target=detect_lane_model, args= (model, img))
@@ -114,12 +113,12 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
     cv2.imshow("pred_birdview", pred_birdview)
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
-    left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
+    left_point, right_point = find_left_right_points(0.5, pred_birdview, draw=draw)
     left_point_2, right_point_2 = find_left_right_points(0.9, pred_birdview, draw=draw)
     left_point_3, right_point_3 = find_left_right_points(0.95, pred_birdview, draw=draw)
     left_point_4, right_point_4 = find_left_right_points(0.3, pred_birdview, draw=draw)
     
-    # left_point_5, right_point_5 = 
+    # lgiteft_point_5, right_point_5 = 
     object_left, object_right = find_left_right_points(0.1, pred_birdview, draw=draw)
 
     lane_width = 42
@@ -159,7 +158,13 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
         check_move = True
         sign_list = []
         angle_turn = 90
+    
+    if len(sign_list) > 0:
+        sign = st.mode(sign_list)
+        if (sign == 'straight' and distance < 10) or (sign == 'no_entry' and distance < 10):
+            sign_list = []
 
+    #if turn left or turn right return true/false value to discard global sign_lst
     check_to_discard = False
     if time_to_turn and check_distance:
         check_to_discard = True

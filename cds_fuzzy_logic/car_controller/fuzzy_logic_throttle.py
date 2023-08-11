@@ -160,11 +160,11 @@ if __name__ == '__main__':
     # print(function1(0.8, 0.4))
     # print(function1(0.1, 0.5))
         
-    # with open(r'cds_fuzzy_logic/speed_func/lr_sign_func.pkl', 'rb') as f:
-    #     lr_sign_function = pickle.load(f)
+    with open(r'cds_fuzzy_logic/speed_func/lr_sign_func.pkl', 'rb') as f:
+        lr_sign_function = pickle.load(f)
     
-    # print(lr_sign_function(1,0.01))
-    create_function()
+    print(lr_sign_function(0,0.45))
+    # create_function()
     # print(lr_rule())    
     # x_values_plot = np.arange(0, 1.01, 0.01)
     # y_values_plot = np.arange(0, 1.01, 0.01)
