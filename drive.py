@@ -16,7 +16,7 @@ import statistics as st
 
 
 ###############################################################
-config_path = 'config_param.json'
+config_path = './config_param.json'
 with open(config_path) as config_buffer:
     config = json.loads(config_buffer.read())
 

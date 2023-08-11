@@ -38,8 +38,8 @@ speed = ctrl.Consequent(np.arange(0, 0.51, 0.01), 'speed')
 
 speed[STOP] = fuzz.trimf(speed.universe, [0, 0, 0])
 speed[SLOW] = fuzz.trapmf(speed.universe, [0, 0, 0.125, 0.25])
-speed[MEDIUM] = fuzz.trapmf(speed.universe, [0.125, 0.25, 0.35, 0.4])
-speed[FAST] = fuzz.trapmf(speed.universe, [0.35, 0.4, 0.4, 0.4])
+speed[MEDIUM] = fuzz.trapmf(speed.universe, [0.125, 0.25, 0.375, 0.5])
+speed[FAST] = fuzz.trapmf(speed.universe, [0.375, 0.5, 0.5, 0.5])
 
 
 #Create rule for inference
