@@ -108,9 +108,9 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
     left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
-    left_point_2, right_point_2 = find_left_right_points(0.85, pred_birdview, draw=draw)
+    left_point_2, right_point_2 = find_left_right_points(0.9, pred_birdview, draw=draw)
     left_point_3, right_point_3 = find_left_right_points(0.95, pred_birdview, draw=draw)
-    left_point_4, right_point_4 = find_left_right_points(0.2, pred_birdview, draw=draw)
+    left_point_4, right_point_4 = find_left_right_points(0.3, pred_birdview, draw=draw)
     object_left, object_right = find_left_right_points(0.1, pred_birdview, draw=draw) #cam thang nao chinh ROI
     
     check_to_discard = False
