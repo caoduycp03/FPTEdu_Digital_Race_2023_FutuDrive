@@ -77,10 +77,10 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
 
 distance_lst = []
 sign_lst = []
-
+throttle_lst = []
 async def process_image(websocket, path):
     async for message in websocket:
-        global distance_lst, sign_lst
+        global distance_lst, sign_lst, throttle_lst
         # Get image from simulation
         data = json.loads(message)
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
@@ -115,9 +115,8 @@ async def process_image(websocket, path):
             cars = []
 
         # Send back throttle and steering angle
-        # print("----------------------------", signs)
 
-        #calculate the distance for signs
+        # calculate the distance for signs
         distance = None
         if signs:
             sign = signs[-1][0]
@@ -140,7 +139,7 @@ async def process_image(websocket, path):
         #discard straight, no entry when go through
         if len(sign_lst) > 0:
             sign = st.mode(sign_lst)
-            if (sign == 'straight' and distance < 10) or (sign == 'no_entry' and distance < 10):
+            if (sign == 'straight' and distance < 20) or (sign == 'no_entry' and distance < 20):
                 distance_lst =[]
                 sign_lst = []
 
@@ -160,14 +159,12 @@ async def process_image(websocket, path):
                 for item in sign_pos:
                     item.pop(0)
                 number = 'big'
-            
                 
             distance_car, right, left = counter_car(sign_pos, 320, 240, number)
             lst_car = [distance_car, right, left]
             
-
         # decide how car will go
-        angle, check_discard= calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
+        angle, check_discard, decrease_throttle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
         if check_discard == True:
             distance_lst = []
             sign_lst = []
@@ -184,29 +181,37 @@ async def process_image(websocket, path):
         if len(sign_lst) !=0:
             sign = st.mode(sign_lst)
             print(distance)
-            distance = (distance - 0) / (100 - 0)
+            distance = (distance - 0) / (200 - 0)
     
             #Using steering and distance to determine throttle
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
             if sign == 'stop':
-                # throttle = stop_sign_function(steering, distance).item()
-                throttle = 0
+                throttle = straight_sign_function(steering, distance).item() # DI QUA BIEN BAO CUNG DUOC
             if sign  == 'noentry':
-                throttle = noentry_sign_function(steering, distance).item()
+                throttle = straight_sign_function(steering, distance).item() # KHONG CO NO ENTRY
             if sign == 'straight':
                 throttle = straight_sign_function(steering, distance).item()
         
         if len(lst_car) != 0:
             distance_car = lst_car[0]
-            distance_car = (distance_car - 0) / (240 - 0)
+            distance_car = (distance_car - 0) / (250 - 0)
             throttle = object_function(steering, distance_car).item()
-    
+        
+        if len(throttle_lst) >= 200:        
+            if throttle_lst[-1] != 0:      
+                if decrease_throttle and all(i>0.3 for i in throttle_lst[-20:]): #vi khong nhan 
+                    throttle = 0
+                    print('phanh')
+            else: 
+                if decrease_throttle: 
+                    throttle = 0
+                    print('phanh')
 
+        throttle_lst.append(throttle)
         cv2.imshow("draw", draw)
         cv2.waitKey(1)
         # Send back throttle and steering angle
-        # throttle, steering_angle = 0,0
         message = json.dumps(
             {"throttle": throttle, "steering": steering})
         print(message)

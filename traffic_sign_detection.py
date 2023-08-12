@@ -63,15 +63,14 @@ def counter_car(signs_pos, width, height, number):
         
     
     else: 
-        print('bigger', signs_pos)
+        # print('bigger', signs_pos)
         chosen_signs = signs_pos[0]
         
         if signs_pos[1][2] > signs_pos[0][2]:
             chosen_signs  = signs_pos[1]
             
-            
 
-    print('final',chosen_signs)
+    # print('final',chosen_signs)
 
     origin_width = 320
     origin_height = 240
