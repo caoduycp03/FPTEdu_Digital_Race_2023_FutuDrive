@@ -114,9 +114,9 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
     cv2.waitKey(1)
     draw[:, :] = birdview_transform(draw)
     left_point, right_point = find_left_right_points(0.7, pred_birdview, draw=draw)
-    left_point_2, right_point_2 = find_left_right_points(0.85, pred_birdview, draw=draw)
-    left_point_3, right_point_3 = find_left_right_points(0.98, pred_birdview, draw=draw)
-    left_point_4, right_point_4 = find_left_right_points(0.2, pred_birdview, draw=draw)
+    left_point_2, right_point_2 = find_left_right_points(0.9, pred_birdview, draw=draw)
+    left_point_3, right_point_3 = find_left_right_points(0.95, pred_birdview, draw=draw)
+    left_point_4, right_point_4 = find_left_right_points(0.3, pred_birdview, draw=draw)
     object_left, object_right = find_left_right_points(0.1, pred_birdview, draw=draw) #khong duoc chinh ROI
     
     check_to_discard = False
@@ -143,9 +143,9 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
             check_distance = True
 
     if len(sign_list) > 0:   
+        print('duy pro', st.mode(sign_list))
         if (st.mode(sign_list) == 'left' and abs(left_point_2 - left_point_3) >= 5) or (st.mode(sign_list) == 'right' and abs(right_point_2 - right_point_3) >= 5):
             if check_distance:
-                print('duy pro', st.mode(sign_list))
                 time_to_turn = True
                 check_move = False
     

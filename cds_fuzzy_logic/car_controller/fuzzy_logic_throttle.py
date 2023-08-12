@@ -138,7 +138,7 @@ def create_speed_function(mode = 'normal_throttle'): #create a function for spee
     return curve
 
 def create_function(): #create re-usable function
-    mode_list = ['normal_throttle', 'object', 'straight_sign', 'stop_sign', 'lr_sign', 'noentry_sign'] 
+    mode_list = ['stop_sign'] 
     for mode in mode_list:
         func = create_speed_function(mode)
         with open (f'cds_fuzzy_logic/speed_func/{mode}_func.pkl', 'wb') as f: 

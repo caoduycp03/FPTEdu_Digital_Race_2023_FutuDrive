@@ -59,7 +59,6 @@ car_queue = Queue(maxsize= 5)
 def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
     while True:
         if g_image_queue.empty():
-            time.sleep(0.1)
             continue
         image = g_image_queue.get()
         # Prepare visualization image
@@ -82,10 +81,10 @@ sign_lst = []
 throttle_lst = []
 
 throttle = 0
-def sleep_when_detect_stop():
-    global throttle
-    time.sleep(0.5)
-    throttle = 0
+# def sleep_when_detect_stop():
+#     global throttle
+#     time.sleep(0.03)
+#     throttle = 0
 
 async def process_image(websocket, path):
     async for message in websocket:
@@ -127,6 +126,8 @@ async def process_image(websocket, path):
 
         # calculate the distance for signs
         distance = None
+        if distance_lst:
+            print(distance_lst[-1])
         if signs:
             sign = signs[-1][0]
             sign_lst.append(sign)
@@ -135,15 +136,24 @@ async def process_image(websocket, path):
             signs_pos.pop(0)
             car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
             distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
-            if distance < 0:
+            if distance < 0 and distance_lst[-1] < 25:
                 distance = 0
             #print(distance_lst)
             distance_lst.append(distance)
             
             if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
                 distance_lst.pop(-1)
+        
+        if len(sign_lst) > 0 and len(distance_lst) > 0:    
+            if len(signs) == 0 and sign_lst[-1] == 'stop' and distance_lst[-1] <= 20:
+                distance_lst.append(0)
+
         if distance_lst:
             distance = distance_lst[-1]
+
+        if len(sign_lst) > 0:    
+            if len(signs) == 0 and sign_lst[-1] == 'stop':
+                distance_lst.append(0)
         
         #discard straight, no entry when go through
         if len(sign_lst) > 0:
@@ -175,8 +185,7 @@ async def process_image(websocket, path):
         # decide how car will go
         angle, check_discard, decrease_throttle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
         if check_discard == True:
-            distance_lst = []
-            sign_lst = []
+             sign_lst = []
 
         if angle > 90:
             angle = angle - 90
@@ -196,11 +205,13 @@ async def process_image(websocket, path):
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
             if sign == 'stop':
-                # throttle = straight_sign_function(steering, distance).item() # DI QUA BIEN BAO CUNG DUOC
-                top_sleep = threading.Thread(target= sleep_when_detect_stop)
-                top_sleep.start()
+                throttle = stop_sign_function(steering, distance).item()
+                # stop_sleep = threading.Thread(target= sleep_when_detect_stop)
+                # stop_sleep.start()
+                # throttle = 0
                 # print(throttle)
- 
+                if distance == 0:
+                    throttle = 0
             if sign  == 'noentry':
                 throttle = straight_sign_function(steering, distance).item() # KHONG CO NO ENTRY
             if sign == 'straight':
