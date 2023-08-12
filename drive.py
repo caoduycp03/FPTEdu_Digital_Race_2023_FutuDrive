@@ -126,19 +126,21 @@ async def process_image(websocket, path):
 
         # calculate the distance for signs
         distance = None
-        if distance_lst:
-            print(distance_lst[-1])
+
         if signs:
             sign = signs[-1][0]
+            print('that', sign)
             sign_lst.append(sign)
-
             signs_pos = signs[-1][:]
             signs_pos.pop(0)
             car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
             distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
-            if distance < 0 and distance_lst[-1] < 25:
-                distance = 0
-            #print(distance_lst)
+            print('that',distance)
+            
+            if len(distance_lst)>0:
+                if distance < 0 and distance_lst[-1] <= 20:
+                    distance = 0
+
             distance_lst.append(distance)
             
             if len(distance_lst) > 2 and distance_lst[-2] < distance_lst[-1]:
@@ -150,10 +152,6 @@ async def process_image(websocket, path):
 
         if distance_lst:
             distance = distance_lst[-1]
-
-        if len(sign_lst) > 0:    
-            if len(signs) == 0 and sign_lst[-1] == 'stop':
-                distance_lst.append(0)
         
         #discard straight, no entry when go through
         if len(sign_lst) > 0:
@@ -186,6 +184,7 @@ async def process_image(websocket, path):
         angle, check_discard, decrease_throttle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
         if check_discard == True:
              sign_lst = []
+             distance_lst = []
 
         if angle > 90:
             angle = angle - 90
@@ -209,7 +208,6 @@ async def process_image(websocket, path):
                 # stop_sleep = threading.Thread(target= sleep_when_detect_stop)
                 # stop_sleep.start()
                 # throttle = 0
-                # print(throttle)
                 if distance == 0:
                     throttle = 0
             if sign  == 'noentry':

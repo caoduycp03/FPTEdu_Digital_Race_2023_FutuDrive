@@ -171,8 +171,6 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
 ###############
     
     if lst_car:
-        print(left_point_4, object_left)
-        print(right_point_4, object_right)
         if object_left - left_point_4 >= 10:
             car_location = "left"
         if right_point_4 - object_right >= 10:
@@ -190,7 +188,6 @@ def calculate_control_signal(img, signs, lst_car, distance, draw=None):
             center_1 = (right_point + left_point)/2
             left_point = (center_1 + right_point)/2
     
-    print("diem xa", left_point_4, right_point_4)
     if left_point_4 == -1 and right_point_4 == -1:
         decrease_throttle = True
 
