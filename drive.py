@@ -13,7 +13,7 @@ from traffic_sign_detection import detect_sign, detect_distance, counter_car
 import pickle
 from ultralytics import YOLO
 import statistics as st
-
+import threading
 
 ###############################################################
 config_path = './config_param.json'
@@ -54,6 +54,8 @@ g_image_queue = Queue(maxsize=5)
 sign_queue = Queue(maxsize=5)
 car_queue = Queue(maxsize= 5)
 
+
+
 def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
     while True:
         if g_image_queue.empty():
@@ -78,9 +80,16 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
 distance_lst = []
 sign_lst = []
 throttle_lst = []
+
+throttle = 0
+def sleep_when_detect_stop():
+    global throttle
+    time.sleep(0.5)
+    throttle = 0
+
 async def process_image(websocket, path):
     async for message in websocket:
-        global distance_lst, sign_lst, throttle_lst
+        global distance_lst, sign_lst, throttle_lst, throttle
         # Get image from simulation
         data = json.loads(message)
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
@@ -187,7 +196,11 @@ async def process_image(websocket, path):
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
             if sign == 'stop':
-                throttle = straight_sign_function(steering, distance).item() # DI QUA BIEN BAO CUNG DUOC
+                # throttle = straight_sign_function(steering, distance).item() # DI QUA BIEN BAO CUNG DUOC
+                top_sleep = threading.Thread(target= sleep_when_detect_stop)
+                top_sleep.start()
+                # print(throttle)
+ 
             if sign  == 'noentry':
                 throttle = straight_sign_function(steering, distance).item() # KHONG CO NO ENTRY
             if sign == 'straight':
