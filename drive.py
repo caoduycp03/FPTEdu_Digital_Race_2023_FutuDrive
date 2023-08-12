@@ -27,7 +27,7 @@ HEIGHT_SIGN = config['general']['height_sign']
 model_detect_sign_path = config['throttle_04']['model_detect_sign_path']
 model_detect_sign = YOLO(model_detect_sign_path)
 ##############################################################
-
+#LOAD FUZZY FUNCTION FOR THROTTLE AND STEERING
 with open(r'cds_fuzzy_logic/speed_func/normal_throttle_func.pkl', 'rb') as f:
     speed_function = pickle.load(f)
 
@@ -48,13 +48,11 @@ with open(r'cds_fuzzy_logic/speed_func/noentry_sign_func.pkl', 'rb') as f:
 
 with open(r'cds_fuzzy_logic/speed_func/straight_sign_func.pkl', 'rb') as f:
     straight_sign_function = pickle.load(f)
-
+##############################################################
 
 g_image_queue = Queue(maxsize=5)
 sign_queue = Queue(maxsize=5)
 car_queue = Queue(maxsize= 5)
-
-
 
 def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
     while True:
@@ -68,7 +66,6 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
         if sign:
             if not sign_queue.full():
                 sign_queue.put(sign)
-
         if car:
             if not car_queue.full():
                 car_queue.put(car)   
@@ -78,17 +75,10 @@ def process_traffic_sign_loop(g_image_queue, sign_queue, car_queue):
 
 distance_lst = []
 sign_lst = []
-throttle_lst = []
-
-throttle = 0
-# def sleep_when_detect_stop():
-#     global throttle
-#     time.sleep(0.03)
-#     throttle = 0
-
 async def process_image(websocket, path):
     async for message in websocket:
-        global distance_lst, sign_lst, throttle_lst, throttle
+        global distance_lst, sign_lst
+        ###### PREPROCESSING AND CALCULATE USEFUL VALUES 
         # Get image from simulation
         data = json.loads(message)
         image = Image.open(BytesIO(base64.b64decode(data["image"])))
@@ -107,7 +97,6 @@ async def process_image(websocket, path):
         image = cv2.resize(image, (WIDTH, HEIGHT))
         draw = image.copy()
 
-
         # Update image to g_image_queue - used to run sign detection
         if not g_image_queue.full():
             g_image_queue.put(image_sign)
@@ -122,20 +111,16 @@ async def process_image(websocket, path):
         else:
             cars = []
 
-        # Send back throttle and steering angle
-
-        # calculate the distance for signs
+        # Calculate the distance for signs
         distance = None
 
         if signs:
             sign = signs[-1][0]
-            print('that', sign)
             sign_lst.append(sign)
             signs_pos = signs[-1][:]
             signs_pos.pop(0)
             car_pos = [WIDTH_SIGN/2, HEIGHT_SIGN]
             distance = detect_distance(signs_pos, car_pos, WIDTH_SIGN, HEIGHT_SIGN)
-            print('that',distance)
             
             if len(distance_lst)>0:
                 if distance < 0 and distance_lst[-1] <= 20:
@@ -153,16 +138,14 @@ async def process_image(websocket, path):
         if distance_lst:
             distance = distance_lst[-1]
         
-        #discard straight, no entry when go through
+        # Discard straight, no entry when go through
         if len(sign_lst) > 0:
             sign = st.mode(sign_lst)
             if (sign == 'straight' and distance < 20) or (sign == 'no_entry' and distance < 20):
                 distance_lst =[]
                 sign_lst = []
 
-        #print('True distance', distance)
-
-        #calculate the distance for car
+        # Calculate the distance for car (object)
         lst_car = []
         if cars:
             sign_pos = []
@@ -180,12 +163,13 @@ async def process_image(websocket, path):
             distance_car, right, left = counter_car(sign_pos, 320, 240, number)
             lst_car = [distance_car, right, left]
             
-        # decide how car will go
-        angle, check_discard, decrease_throttle = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
+        ###### CAR CONTROLLER
+        angle, check_discard, brake = calculate_control_signal(image_lane, signs, lst_car, distance, draw=draw)
         if check_discard == True:
              sign_lst = []
              distance_lst = []
-
+        
+        # Transform angle to range of 
         if angle > 90:
             angle = angle - 90
             steering = - steering_function(angle).item()
@@ -193,44 +177,39 @@ async def process_image(websocket, path):
             angle = 90 - angle
             steering = steering_function(angle).item()
 
+        # Determine throttle by steering (normal road)
         throttle = speed_function(abs(steering)).item()
-
+        
+        # Using steering and distance to determine throttle (if has sign)
         if len(sign_lst) !=0:
             sign = st.mode(sign_lst)
             print(distance)
             distance = (distance - 0) / (200 - 0)
-    
-            #Using steering and distance to determine throttle
+
             if sign == 'right' or sign == 'left':
                 throttle = lr_sign_function(steering, distance).item()
             if sign == 'stop':
                 throttle = stop_sign_function(steering, distance).item()
-                # stop_sleep = threading.Thread(target= sleep_when_detect_stop)
-                # stop_sleep.start()
-                # throttle = 0
                 if distance == 0:
                     throttle = 0
             if sign  == 'noentry':
                 throttle = straight_sign_function(steering, distance).item() # KHONG CO NO ENTRY
             if sign == 'straight':
                 throttle = straight_sign_function(steering, distance).item()
-        
+
+        # Using steering and distance to determine throttle (if has object)        
         if len(lst_car) != 0:
             distance_car = lst_car[0]
             distance_car = (distance_car - 0) / (250 - 0)
             throttle = object_function(steering, distance_car).item()
-        
-        if len(throttle_lst) >= 200:        
-            if throttle_lst[-1] != 0:      
-                if decrease_throttle and all(i>0.3 for i in throttle_lst[-20:]): #vi khong nhan 
-                    throttle = 0
-                    print('phanh')
-            else: 
-                if decrease_throttle: 
-                    throttle = 0
-                    print('phanh')
 
-        throttle_lst.append(throttle)
+        # Braking when it's in need
+        speed = float(data['speed'])
+        print(speed)      
+        if brake and speed >= 25:
+            throttle = 0
+            print('phanh')
+
         cv2.imshow("draw", draw)
         cv2.waitKey(1)
         # Send back throttle and steering angle

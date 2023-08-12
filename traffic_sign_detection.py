@@ -39,12 +39,9 @@ def detect_distance(sign_position, car_position, width, height):
     shortest_dis = 379
     simulator_longest_dis = 80
 
-    
-
     sign_position[0], sign_position[1] = (sign_position[0] *(origin_width/width)), (sign_position[1] *(origin_height/height))
     sign_position[2], sign_position[3] = (sign_position[2] *(origin_width/width)), (sign_position[3] *(origin_height/height))
     car_position[0], car_position[1] = (car_position[0] *(origin_width/width)), (car_position[1] *(origin_height/height))
-
 
     center_sign = [(sign_position[0] + sign_position[2])/2, (sign_position[1] + sign_position[3])/2]
 
@@ -55,32 +52,20 @@ def detect_distance(sign_position, car_position, width, height):
 
 def counter_car(signs_pos, width, height, number):
     
-    print('1')
     if number == 'NO':
         return None, None, None
     if number == 'small':
         chosen_signs = signs_pos
         
-    
     else: 
-        # print('bigger', signs_pos)
         chosen_signs = signs_pos[0]
         
         if signs_pos[1][2] > signs_pos[0][2]:
             chosen_signs  = signs_pos[1]
             
-
-    # print('final',chosen_signs)
-
     origin_width = 320
     origin_height = 240
     chosen_signs = np.array(chosen_signs)
-    
-
-    longest_dis = 170
-    shortest_dis = 0
-    simulator_longest_dis = 100
-
 
     chosen_signs[0], chosen_signs[1] = (chosen_signs[0] *float(origin_width/width)), (chosen_signs[1] *float(origin_height/height))
     chosen_signs[2], chosen_signs[3] = (chosen_signs[2] *float(origin_width/width)), (chosen_signs[3] *float(origin_height/height))
@@ -88,8 +73,6 @@ def counter_car(signs_pos, width, height, number):
     right = False
     left = False
     
-    #center_sign = [(chosen_signs[0] + chosen_signs[2])/2, (chosen_signs[1] + chosen_signs[3])/2]
-
     distance_2d = 100
     if chosen_signs[0] + chosen_signs[2]/2 < width/2:
         left = True
@@ -98,17 +81,11 @@ def counter_car(signs_pos, width, height, number):
             
         else:
             distance_2d = chosen_signs[0]/2.5
-          
-        
 
     if chosen_signs[0] + chosen_signs[2]/2 > width/2:
         right = True
         distance_2d = ((chosen_signs[0] + chosen_signs[2] -290)**2 + ((chosen_signs[1]))**2)**(1/2)
-        
-       
-    
-    #simu_dis = simu_dis - simu_dis*(distance_2d/(longest_dis - shortest_dis))
-    
+            
     return distance_2d, right, left
 
 
