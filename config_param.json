@@ -8,7 +8,7 @@
 
     "throttle_04": {
         "throttle":                     0.8,
-        "model_onnx_path":              "pretrained/UNET_train.030.onnx",
+        "model_onnx_path":              "pretrained/UNET_train_2.020.onnx",
         "model_detect_sign_path":       "pretrained/acc_99.pt"
     }
 }
