@@ -1,6 +1,6 @@
 # Digital_Race_2023: https://digitalrace.feexp.space/
 Source code for self driving car in VIA simulator, which is contributed by FutuDrive - my team in Digital Race 2023
-
+Video demo: https://www.youtube.com/watch?v=vvIJnms4OcI
 ### Installation
 
 - conda create -n futudrive python==3.10.12
