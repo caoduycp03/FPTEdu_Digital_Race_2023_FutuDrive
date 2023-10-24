@@ -1,5 +1,7 @@
 # Cuộc đua số 2023 - Thử thách: Thuật toán Tự hành
 
+Video demo clear map by FutuDrive
+
 https://github.com/caoduycp03/FPTEdu_Digital_Race_2023_FutuDrive/assets/127480964/effc147e-19b1-4b30-b782-4a2278eb1e2d
 
 
