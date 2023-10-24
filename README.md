@@ -1,5 +1,8 @@
 # Cuộc đua số 2023 - Thử thách: Thuật toán Tự hành
 
+https://github.com/caoduycp03/FPTEdu_Digital_Race_2023_FutuDrive/assets/127480964/effc147e-19b1-4b30-b782-4a2278eb1e2d
+
+
 Trong thử thách này, các đội chơi sẽ phải lập trình thuật toán điều khiển xe tự hành bám làn và đi theo các biển báo giao thông có sẵn, gồm 5 biển: Rẽ trái (Turn left), Rẽ phải (Turn right), Đi thẳng (Straight), Dừng (Stop) và Cấm (No entry).
 
 Các đội chơi thực hiện phát triển, tối ưu các thuật toán AI để điều khiển xe tự lái trong môi trường giả lập. Trong buổi thi đấu chính thức, mỗi đội sẽ có thời gian 1h để tối ưu thuật toán theo đề bài nhận được từ ban tổ chức.
